@@ -1,0 +1,19 @@
+[project]
+name = "likelion14th"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "hscs12",email = "heesun5795@naver.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django (>=6.0.3,<7.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "likelion14th", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
