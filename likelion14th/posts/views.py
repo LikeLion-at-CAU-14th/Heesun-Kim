@@ -23,7 +23,9 @@ def get_post_detail(reqeuest, id):
         "title" : post.title,
         "content" : post.content,
         "status" : post.status,
-        "writer" : post.writer.username
+        "writer" : post.writer.username,
+        "created_at" : post.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        "updated_at" : post.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
     }
     return JsonResponse({
         "status" : 200,
