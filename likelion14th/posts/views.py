@@ -16,7 +16,7 @@ def index(request):
     return render(request, 'index.html')
 
 @require_http_methods(["GET"])
-def get_post_detail(reqeuest, id):
+def get_post_detail(request, id):
     post = get_object_or_404(Post, pk=id)
     post_detail_json = {
         "id" : post.id,
