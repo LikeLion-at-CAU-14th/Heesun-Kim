@@ -3,6 +3,7 @@ from django.http import JsonResponse # 추가
 from django.shortcuts import get_object_or_404 # 추가
 from django.views.decorators.http import require_http_methods
 from .models import *
+import json
 # Create your views here.
 
 def hello_world(request):
@@ -73,9 +74,6 @@ def post_detail(request, post_id):
             'message' : '게시글 삭제 성공',
             'data' : None
         })
-    
-
-import json
 
 # 게시글을 Post(Create), Get(Read) 하는 뷰 로직
 @require_http_methods(["POST", "GET"])   #함수 데코레이터, 특정 http method 만 허용합니다
@@ -142,8 +140,6 @@ def post_list(request):
         return JsonResponse({
             'status' : 200,
             'message' : '게시글 목록 조회 성공',
-            'category': category_id,   # 확인용
-            'count': len(post_all_json),   # 확인용 
             'data' : post_all_json
         })
 
