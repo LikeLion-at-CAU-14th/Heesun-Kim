@@ -54,7 +54,7 @@ INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', # 반드시 가장 위쪽에 추가
-    'posts.middleware.RequestLoggingMiddleware', # 추가
+    'posts.middleware.RequestLoggingMiddleware', # HTTP 요청 로깅 미들웨어 추가
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -169,7 +169,7 @@ LOGGING = {
 
     'formatters': {
         'standard': {
-            'format': '[{asctime}] {levelname} {message}',
+            'format': '[{asctime}] {levelname} {message}',  # 시간, 로그레벨, URL
             'style': '{',
         },
     },
@@ -182,7 +182,7 @@ LOGGING = {
         },
         'error_file': {
             'class': 'logging.FileHandler',
-            'filename': 'errors.log',
+            'filename': 'errors.log',     # warning 이상 에러 로그 파일
             'formatter': 'standard',
             'level': 'WARNING',
         },
@@ -190,12 +190,12 @@ LOGGING = {
 
     'loggers': {
         'request_logger': {
-            'handlers': ['console'],
+            'handlers': ['console'],    # 모든 요청 콘솔 출력
             'level': 'INFO',
             'propagate': False,
         },
         'error_logger': {
-            'handlers': ['error_file'],
+            'handlers': ['error_file'],    # warning 이상만 파일에 기록
             'level': 'WARNING',
             'propagate': False,
         },
