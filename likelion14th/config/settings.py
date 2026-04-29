@@ -182,7 +182,7 @@ LOGGING = {
         },
         'error_file': {
             'class': 'logging.FileHandler',
-            'filename': 'errors.log',     # warning 이상 에러 로그 파일
+            'filename': BASE_DIR / 'errors.log',     # warning 이상 에러 로그 파일
             'formatter': 'standard',
             'level': 'WARNING',
         },
