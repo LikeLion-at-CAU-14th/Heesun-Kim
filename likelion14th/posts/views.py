@@ -223,8 +223,6 @@ class PostDetail(APIView):
 	        status=status.HTTP_200_OK
 	    )
 
-from .serializers import PostSerializer, CommentSerializer
-
 
 class CommentList(APIView):
     # 댓글 목록 조회
