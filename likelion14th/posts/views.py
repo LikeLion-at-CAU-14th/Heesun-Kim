@@ -234,10 +234,10 @@ class CommentList(APIView):
 
     # 댓글 작성
     def post(self, request, post_id):
-        get_object_or_404(Post, id=post_id)  # post 존재 여부 확인
-        serializer = CommentSerializer(data={**request.data, "post": post_id})
+        post = get_object_or_404(Post, id=post_id)  # post 존재 여부 확인
+        serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(post=post)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -251,8 +251,3 @@ class CommentDelete(APIView):
             {"message": "댓글이 성공적으로 삭제되었습니다.", "comment_id": comment_id},
             status=status.HTTP_200_OK
         )
-
-
-
-
-    
