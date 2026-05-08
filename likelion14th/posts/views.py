@@ -13,6 +13,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 
+#from rest_framework.permissions import IsAuthenticatedOrReadOnly # jwt 세션
+from .permissions import IsAllowedTime, IsOwnerOrReadOnly
+
 # Create your views here.
 
 
@@ -196,15 +199,24 @@ class PostList(APIView):
 
 
 class PostDetail(APIView):
+    #permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAllowedTime, IsOwnerOrReadOnly]
+
+    # object-level permission 체크를 위한 함수
+    def get_object(self, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        self.check_object_permissions(self.request, post)  # ← 이거 없으면 IsOwnerOrReadOnly 동작 안 함
+        return post
+
     # 게시글 상세 조회
     def get(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+        post = self.get_object(post_id)
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
     # 게시글 수정
     def put(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+        post = self.get_object(post_id)
         serializer = PostSerializer(post, data=request.data)
         if serializer.is_valid(): # update이니까 유효성 검사 필요
             serializer.save()
@@ -213,7 +225,7 @@ class PostDetail(APIView):
 
     # 게시글 삭제
     def delete(self, request, post_id):
-	    post = get_object_or_404(Post, id=post_id)
+	    post = self.get_object(post_id)
 	    post.delete()
 	    return Response(
 	        {
