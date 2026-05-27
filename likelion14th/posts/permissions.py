@@ -1,11 +1,13 @@
 from rest_framework.permissions import BasePermission
-from datetime import datetime
+# from datetime import datetime
+from django.utils import timezone
 
 class IsAllowedTime(BasePermission) :
     message = "밤 10시 ~ 아침 7시에는 게시판을 이용할 수 없습니다."
 
     def has_permission(self, request, view) :
-        hour = datetime.now().hour
+        #hour = datetime.now().hour
+        hour = timezone.localtime().hour  # 수정
         if hour >= 22 or hour < 7 :
             return False
         return True

@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 
-#from rest_framework.permissions import IsAuthenticatedOrReadOnly # jwt 세션
+from rest_framework.permissions import IsAuthenticatedOrReadOnly # jwt 세션
 from .permissions import IsAllowedTime, IsOwnerOrReadOnly
 
 # Create your views here.
@@ -199,8 +199,7 @@ class PostList(APIView):
 
 
 class PostDetail(APIView):
-    #permission_classes = [IsAuthenticatedOrReadOnly]
-    permission_classes = [IsAllowedTime, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAllowedTime, IsOwnerOrReadOnly]
 
     # object-level permission 체크를 위한 함수
     def get_object(self, post_id):
@@ -225,15 +224,15 @@ class PostDetail(APIView):
 
     # 게시글 삭제
     def delete(self, request, post_id):
-	    post = self.get_object(post_id)
-	    post.delete()
-	    return Response(
-	        {
-	            "message": "게시글이 성공적으로 삭제되었습니다.",
-	            "post_id": post_id
-	        },
-	        status=status.HTTP_200_OK
-	    )
+        post = self.get_object(post_id)
+        post.delete()
+        return Response(
+            {
+                "message": "게시글이 성공적으로 삭제되었습니다.",
+                "post_id": post_id
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 class CommentList(APIView):
