@@ -22,6 +22,9 @@ from django.http import Http404
 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly # jwt 세션
 from .permissions import IsAllowedTime, IsOwnerOrReadOnly
+from django.utils import timezone
+from config.custom_api_exceptions import PostLimitExceededException
+from config.custom_exceptions import PostNotFoundException # 추가 - 커스텀 예외처리 실습용
 
 # Create your views here.
 
@@ -94,6 +97,35 @@ def post_detail(request, post_id):
             'message' : '게시글 삭제 성공',
             'data' : None
         })
+
+@require_http_methods(["GET"])
+def get_post_detail(reqeust, id):
+    try:
+        post = Post.objects.get(id=id)
+        post_detail_json = {
+            "id" : post.id,
+            "title" : post.title,
+            "content" : post.content,
+            "status" : post.status,
+            "user" : post.user.username
+        }
+        return JsonResponse({
+            "status" : 200,
+            "data": post_detail_json})
+    except Post.DoesNotExist:
+        raise PostNotFoundException
+    
+    post = get_object_or_404(Post, pk=id)
+    post_detail_json = {
+        "id" : post.id,
+        "title" : post.title,
+        "content" : post.content,
+        "status" : post.status,
+        "user" : post.user.username
+    }
+    return JsonResponse({
+        "status" : 200,
+        "data": post_detail_json})
 
 # 게시글을 Post(Create), Get(Read) 하는 뷰 로직
 @require_http_methods(["POST", "GET"])   #함수 데코레이터, 특정 http method 만 허용합니다
@@ -192,18 +224,21 @@ def comment_list(request, post_id):
 class PostList(APIView):
     permission_classes = [IsAllowedTime, IsOwnerOrReadOnly]
     @swagger_auto_schema(
-            operation_summary="게시글 생성",
-            operation_description="새로운 게시글을 생성합니다.",
-            request_body=PostSerializer,  # 요청 데이터의 스키마 정의
-            responses={201: PostSerializer, 400: "잘못된 요청"},  # 응답 데이터의 스키마 정의
+        operation_summary="게시글 생성",
+        operation_description="새로운 게시글을 생성합니다.",
+        request_body=PostSerializer,
+        responses={201: PostSerializer, 400: "잘못된 요청"}
     )
     def post(self, request, format=None):
+        today = timezone.localdate()
+        if Post.objects.filter(writer=request.user, created_at__date=today).exists():
+            raise PostLimitExceededException()
+        
         serializer = PostSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     @swagger_auto_schema(
         operation_summary="게시글 목록 조회",
         operation_description="모든 게시글을 조회합니다.",
@@ -284,10 +319,10 @@ class CommentList(APIView):
     def post(self, request, post_id):
         post = get_object_or_404(Post, id=post_id)
         serializer = CommentSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save(post=post)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CommentDelete(APIView):
     @swagger_auto_schema(
