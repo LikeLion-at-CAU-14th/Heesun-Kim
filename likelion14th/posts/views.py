@@ -230,9 +230,8 @@ class PostList(APIView):
         responses={201: PostSerializer, 400: "잘못된 요청"}
     )
     def post(self, request, format=None):
-        writer_id = request.data.get('writer')
         today = timezone.localdate()
-        if Post.objects.filter(writer_id=writer_id, created_at__date=today).exists():
+        if Post.objects.filter(writer=request.user, created_at__date=today).exists():
             raise PostLimitExceededException()
         
         serializer = PostSerializer(data=request.data)

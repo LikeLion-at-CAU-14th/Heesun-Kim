@@ -28,7 +28,20 @@ class ExceptionHandlerMiddleware:
                 'status_code': 404,
                 'code': 'NOT-FOUND'
             }
-        
+        elif isinstance(exception, BaseCustomException):
+            return {
+                'message': exception.detail,
+                'status_code': exception.status_code,
+                'code': exception.code
+            }
+        else:
+            # 기타 예외
+            return {
+                'message': 'An internal server error occurred.',
+                'status_code': 500,
+                'code': 'INTERNAL-SERVER-ERROR'
+            }
+
     def _create_unified_response(self, request, error_info):
         return {
             'success': False,
@@ -38,21 +51,3 @@ class ExceptionHandlerMiddleware:
                 'status_code': error_info.get('status_code', 500),
             }
         }
-
-    def _get_error_info(self, exception):
-            # 커스텀 예외 
-        if isinstance(exception, BaseCustomException):
-            return {
-                'message': exception.detail,
-                'status_code': exception.status_code,
-                'code': exception.code
-            }
-
-            # 기타 예외
-        return {
-            'message': 'An internal server error occurred.',
-            'status_code': 500,
-            'code': 'INTERNAL-SERVER-ERROR'
-        }
-    
-    
